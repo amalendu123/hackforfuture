@@ -2,9 +2,9 @@ from flask import Flask, request, jsonify, render_template
 import os
 import pandas as pd
 import google.generativeai as genai
-
+from flask_cors import CORS 
 app = Flask(__name__)
-
+CORS(app) 
 # Configure the Gemini API
 os.environ["GOOGLE_API_KEY"] = "AIzaSyCQ0o6QCWeSn6czUrGu0kAGmtxKTV8oq8U"
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
@@ -48,24 +48,38 @@ def generate_prompt(description):
     response = model.generate_content(f"Create a green building design prompt based on: {description}")
     return response.text.strip()
 
-def generate_building_image():
-    description = "generate an eco-friendly building design"
-    prompt = generate_prompt(description)
-    url = f"https://image.pollinations.ai/prompt/{prompt.replace(' ', '%20')}"
-    return url
-
-# Material recommender logic
 def generate_material_description(material_name):
     prompt = f"Provide a brief description of {material_name} and its use in green building."
     model = genai.GenerativeModel('gemini-pro')
     response = model.generate_content(prompt)
     return response.text
 
-@app.route('/')
-def index():
-    image_url = generate_building_image()
-    return render_template('index.html', image_url=image_url)
+    
+def generate_prompt(description):
+    model = genai.GenerativeModel('gemini-pro')
+    response = model.generate_content(
+        f"Create a creative and complex green building design prompt based on: {description} specifying the color, shape and view of the building. The shape can be yellow, white, blue, orange, and the shape can be round, square, triangle, hexagon.",
+        generation_config=genai.GenerationConfig(
+            max_output_tokens=1000,
+            temperature=0.2,
+        )
+    )
+    return response.text.strip()
 
+def generate_building_image(description):
+    prompt = generate_prompt(description)
+    url = f"https://image.pollinations.ai/prompt/{prompt.replace(' ', '%20')}"
+    return url
+
+@app.route('/generate_image', methods=['POST'])
+def generate_image():
+    data = request.json
+    description = data.get('description', "eco-friendly building design")
+    
+    image_url = generate_building_image(description)
+    
+   
+    return jsonify({'image_url': image_url})
 @app.route('/ask', methods=['POST'])
 def ask():
     user_input = request.json.get('input')
@@ -90,4 +104,4 @@ def recommend_materials():
     return jsonify({"recommendations": descriptions})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True)is not working
