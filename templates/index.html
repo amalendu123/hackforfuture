@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Green Building Tool</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Green Building Tool</h1>
+
+        <!-- Chatbot Section -->
+        <div class="chat-container">
+            <h2>Chat with our Bot</h2>
+            <div id="chat-box"></div>
+            <input type="text" id="user-input" placeholder="Ask me anything...">
+            <button id="send-btn">Send</button>
+        </div>
+
+        <!-- AI Image Generation Section -->
+        <h2>Generated Green Building Design</h2>
+        <img src="{{ image_url }}" alt="Generated Building Design" class="generated-image" />
+        <p><a href="{{ image_url }}" target="_blank">View Full Image</a></p>
+
+        <!-- Material Recommender Section -->
+        <h2>Material Selection Assistant</h2>
+        <div>
+            <label for="budget">Enter your budget:</label>
+            <input type="number" id="budget" min="1" required>
+        </div>
+        <div>
+            <label for="buildingType">Building Type:</label>
+            <select id="buildingType">
+                <option value="Residential">Residential</option>
+                <option value="Commercial">Commercial</option>
+            </select>
+        </div>
+        <button onclick="getRecommendations()">Get Recommendations</button>
+        <div id="results"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
